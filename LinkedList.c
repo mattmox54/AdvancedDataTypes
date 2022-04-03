@@ -1,5 +1,8 @@
 #include "AdvancedDataTypes.h"
 #include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 //=================================================================================================
 //DEFINES & CONSTANTS
@@ -44,8 +47,8 @@ static Node __cdecl GetNodeFromID(PrivateData pd, int id);
 //=================================================================================================
 
 LinkedList __cdecl NEW_LinkedList(void){
-	LinkedList list = malloc(sizeof(struct __LinkedList));
-	PrivateData pd = malloc(sizeof(struct __PrivateData));
+	LinkedList list = (LinkedList)malloc(sizeof(struct __LinkedList));
+	PrivateData pd = (PrivateData)malloc(sizeof(struct __PrivateData));
 	
 	if(list==NULL || pd==NULL)
 		goto CLEANUP;
@@ -149,7 +152,7 @@ static int __cdecl Insert(LinkedList self, void* data, int method, int id){
 	
 	if(pd->head==NULL && pd->tail==NULL){
 		//list empty
-		insertNode = malloc(sizeof(struct __Node));
+		insertNode = (Node)malloc(sizeof(struct __Node));
 	
 		insertNode->id = ++pd->count;
 		insertNode->data = data;
@@ -164,7 +167,7 @@ static int __cdecl Insert(LinkedList self, void* data, int method, int id){
 			return ERR_UNKNOWN_ID;
 		}
 	
-		insertNode = malloc(sizeof(struct __Node));
+		insertNode = (Node)malloc(sizeof(struct __Node));
 	
 		insertNode->id = ++pd->count;
 		insertNode->data = data;

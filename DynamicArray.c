@@ -1,6 +1,9 @@
 #include "AdvancedDataTypes.h"
 #include <stddef.h>
 #include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 //=================================================================================================
 //DEFINES & CONSTANTS
@@ -8,7 +11,7 @@
 #define APPEND_VA_ARG(s, dtype) 									\
 	do{																\
 		void* _s = NULL;											\
-		_s = realloc(s->_array, sizeof(dtype)*(++s->len));			\
+		_s = (dtype*)realloc(s->_array, sizeof(dtype)*(++s->len));	\
 		if(_s==NULL)												\
 			return -2;												\
 		s->_array = _s;												\
@@ -37,7 +40,7 @@ int DA_Stringify(DynamicArray self, char string[]);
 //=================================================================================================
 
 DynamicArray NEW_DynamicArray(int DataType){
-	DynamicArray self = malloc(sizeof(struct __DynamicArray));
+	DynamicArray self = (DynamicArray)malloc(sizeof(struct __DynamicArray));
 	if(self==NULL)
 		return NULL;
 	
@@ -100,7 +103,7 @@ int DA_Append(DynamicArray self, ...){
 			break;
 		case ADVDT_STR:
 			strTemp = va_arg(valist, char*); //get value to add
-			tmpArray = realloc(self->_array, sizeof(char*)*(++self->len)); //resize array
+			tmpArray = (char*)realloc(self->_array, sizeof(char*)*(++self->len)); //resize array
 			if (tmpArray == NULL) {
 				return -2;
 			}
@@ -127,7 +130,7 @@ DynamicArray DA_Copy(DynamicArray self){
 	if(self==NULL)
 		return NULL;
 	
-	newArray = malloc(sizeof(struct __DynamicArray));
+	newArray = (DynamicArray)malloc(sizeof(struct __DynamicArray));
 	if(self==NULL)
 		return NULL;
 	
@@ -135,17 +138,17 @@ DynamicArray DA_Copy(DynamicArray self){
 	
 	switch(newArray->dataType){
 		case ADVDT_INT:
-			newArray->_array = malloc(sizeof(int)*newArray->len);
+			newArray->_array = (int*)malloc(sizeof(int)*newArray->len);
 			memcpy(newArray->_array, self->_array, sizeof(int)*newArray->len);
 			break;
 		case ADVDT_DBL:
-			newArray->_array = malloc(sizeof(double)*newArray->len);
+			newArray->_array = (double*)malloc(sizeof(double)*newArray->len);
 			memcpy(newArray->_array, self->_array, sizeof(double)*newArray->len);
 			break;
 		case ADVDT_STR:
-			newArray->_array = malloc(sizeof(char*)*newArray->len);
+			newArray->_array = (char**)malloc(sizeof(char*)*newArray->len);
 			for(int i=0; i<newArray->len; i++){
-				((char**)newArray->_array)[i] = malloc(sizeof(char)*(strlen(((char**)self->_array)[i])+1));
+				((char**)newArray->_array)[i] = (char*)malloc(sizeof(char)*(strlen(((char**)self->_array)[i])+1));
 				strcpy(((char**)newArray->_array)[i], ((char**)self->_array)[i]);
 			}
 			break;
@@ -252,7 +255,7 @@ int DA_Insert(DynamicArray self, int Index, ...){
 	
 	switch(self->dataType){
 		case ADVDT_INT:
-			_array = malloc(sizeof(int)*(self->len+1));
+			_array = (int*)malloc(sizeof(int)*(self->len+1));
 			if(Index!=0) //nothing to copy before Index if insert at beginning
 				memcpy(_array, self->_array, sizeof(int)*Index);
 			((int*)_array)[Index] = va_arg(valist, int);
@@ -262,7 +265,7 @@ int DA_Insert(DynamicArray self, int Index, ...){
 			self->_array = _array;
 			break;
 		case ADVDT_DBL:
-			_array = malloc(sizeof(double)*(self->len+1));
+			_array = (double*)malloc(sizeof(double)*(self->len+1));
 			if(Index!=0) //nothing to copy before Index if insert at beginning             
 				memcpy(_array, self->_array, sizeof(double)*Index);
 			((double*)_array)[Index] = va_arg(valist, double); 
@@ -272,16 +275,16 @@ int DA_Insert(DynamicArray self, int Index, ...){
 			self->_array = _array;
 			break;
 		case ADVDT_STR:
-			_array = malloc(sizeof(char*)*(self->len+1));  
+			_array = (char**)malloc(sizeof(char*)*(self->len+1));  
 			for(int i=0; i<Index; i++){
-				((char**)_array)[i] = malloc(sizeof(char)*(strlen(((char**)self->_array)[i])+1));
+				((char**)_array)[i] = (char*)malloc(sizeof(char)*(strlen(((char**)self->_array)[i])+1));
 				strcpy(((char**)_array)[i], ((char**)self->_array)[i]);
 				free(((char**)self->_array)[i]);    
 			}
-			((char**)_array)[Index] = malloc(sizeof(char)*(strlen(((char**)self->_array)[Index])+1));
+			((char**)_array)[Index] = (char*)malloc(sizeof(char)*(strlen(((char**)self->_array)[Index])+1));
 			strcpy(((char**)_array)[Index], ((char**)self->_array)[Index]);
 			for(int i=Index; i<self->len; i++){
-				((char**)_array)[i+1] = malloc(sizeof(char)*(strlen(((char**)self->_array)[i])+1));
+				((char**)_array)[i+1] = (char*)malloc(sizeof(char)*(strlen(((char**)self->_array)[i])+1));
 				strcpy(((char**)_array)[i+1], ((char**)self->_array)[i]);
 				free(((char**)self->_array)[i]);    
 			}
@@ -326,7 +329,7 @@ int DA_Delete(DynamicArray self, int Index){
 	
 	switch(self->dataType){
 		case ADVDT_INT:
-			_array = malloc(sizeof(int)*(self->len-1));
+			_array = (int*)malloc(sizeof(int)*(self->len-1));
 			if(Index!=0) //nothing to copy before Index if insert at beginning
 				memcpy(_array, self->_array, sizeof(int)*Index);
 			memcpy(&((int*)_array)[Index], &((int*)self->_array)[Index+1], sizeof(int)*(self->len-Index-1));
@@ -335,7 +338,7 @@ int DA_Delete(DynamicArray self, int Index){
 			self->_array = _array;
 			break;
 		case ADVDT_DBL:
-			_array = malloc(sizeof(double)*(self->len-1));
+			_array = (double*)malloc(sizeof(double)*(self->len-1));
 			if(Index!=0) //nothing to copy before Index if insert at beginning             
 				memcpy(_array, self->_array, sizeof(double)*Index);
 			memcpy(&((double*)_array)[Index], &((double*)self->_array)[Index+1], sizeof(double)*(self->len-Index-1));
@@ -344,14 +347,14 @@ int DA_Delete(DynamicArray self, int Index){
 			self->_array = _array;
 			break;
 		case ADVDT_STR:
-			_array = malloc(sizeof(char*)*(self->len-1));  
+			_array = (char**)malloc(sizeof(char*)*(self->len-1));  
 			for(int i=0; i<Index; i++){
-				((char**)_array)[i] = malloc(sizeof(char)*(strlen(((char**)self->_array)[i])+1));
+				((char**)_array)[i] = (char*)malloc(sizeof(char)*(strlen(((char**)self->_array)[i])+1));
 				strcpy(((char**)_array)[i], ((char**)self->_array)[i]);
 				free(((char**)self->_array)[i]);
 			}
 			for(int i=Index; i<self->len-1; i++){
-				((char**)_array)[i] = malloc(sizeof(char)*(strlen(((char**)self->_array)[i+1])+1));
+				((char**)_array)[i] = (char*)malloc(sizeof(char)*(strlen(((char**)self->_array)[i+1])+1));
 				strcpy(((char**)_array)[i], ((char**)self->_array)[i+1]);
 				free(((char**)self->_array)[i+1]);    
 			}

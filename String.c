@@ -1,5 +1,8 @@
 #include "AdvancedDataTypes.h"
 #include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 //=================================================================================================
 //DEFINES & CONSTANTS
@@ -29,10 +32,10 @@ int __cdecl String_RemoveWhiteSpace(String self);
 String __cdecl NEW_String(const char * initVal){
 	String str = NULL;
 	
-	str = malloc(sizeof(struct __String));
+	str = (String)malloc(sizeof(struct __String));
 	if(initVal!=NULL){
 		str->len = strlen(initVal);
-		str->_buffer = malloc(sizeof(char)*(str->len+1));
+		str->_buffer = (char*)malloc(sizeof(char)*(str->len+1));
 		strcpy(str->_buffer, initVal); 
 	}else{
 		str->_buffer = NULL;
@@ -76,7 +79,7 @@ int __cdecl String_Set(String self, const char * value){
 		return -1;
 	
 	self->len = strlen(value);
-	tmpBuffer = realloc(self->_buffer, sizeof(char)*(self->len+1));
+	tmpBuffer = (char*)realloc(self->_buffer, sizeof(char)*(self->len+1));
 	if (tmpBuffer == NULL) {
 		return -1;
 	}
@@ -101,7 +104,7 @@ int __cdecl String_Append(String self, const char * value){
 		return -1;
 	
 	self->len += strlen(value);
-	tmpBuffer = realloc(self->_buffer, sizeof(char)*(self->len+1));
+	tmpBuffer = (char*)realloc(self->_buffer, sizeof(char)*(self->len+1));
 	if (tmpBuffer == NULL) {
 		return -2;
 	}
@@ -129,7 +132,7 @@ DynamicArray __cdecl String_Split(String self, char deliminator){
 			array->append(array, start);
 			start=NULL;
 		}else{
-			splitVal = malloc(sizeof(char)*(end-start+1));
+			splitVal = (char*)malloc(sizeof(char)*(end-start+1));
 			memcpy(splitVal, start, end-start);
 			splitVal[end-start] = 0; //null terminator
 			array->append(array, splitVal);
@@ -196,7 +199,7 @@ int __cdecl String_RemoveWhiteSpace(String self){
 	if(self==NULL)
 		return -1;
 	
-	bufferCopy = malloc(sizeof(char)*(self->len+1));
+	bufferCopy = (char*)malloc(sizeof(char)*(self->len+1));
 	
 	for(int i=0; i<self->len; i++){
 		if(self->_buffer[i]>=33){

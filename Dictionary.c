@@ -1,6 +1,9 @@
 #include "AdvancedDataTypes.h"
 #include <stddef.h>
 #include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 //=================================================================================================
 //DEFINES & CONSTANTS
@@ -41,14 +44,14 @@ static unsigned long Hash(unsigned char *str);
 //=================================================================================================
 
 Dict NEW_Dict(int maxEntries){
-	Dict dict = malloc(sizeof(struct __Dict));
+	Dict dict = (Dict)malloc(sizeof(struct __Dict));
 	DictEntry DictInitialVal = {
 		.key = "",
 		.dType = ADVDT_NONE,
 		.value = NULL
 	};
 	
-	dict->_dict = malloc(sizeof(DictEntry)*maxEntries);
+	dict->_dict = (DictBuffer)malloc(sizeof(DictEntry)*maxEntries);
 	dict->_len = maxEntries;
 	for(int i=0; i<maxEntries; i++){
 		((DictBuffer)dict->_dict)[i] = DictInitialVal;	
@@ -154,18 +157,18 @@ int Dict_Set(Dict self, const char * key, int dataType, ...){
 	
 	switch(dict[index].dType){
 		case ADVDT_INT:
-			dict[index].value = malloc(sizeof(int));
+			dict[index].value = (int*)malloc(sizeof(int));
 			*(int*)dict[index].value = va_arg(valist, int); 
 			//printf("DICT ADD: %s=%d\n", __key, *(int*)dict[index].value);
 			break;
 		case ADVDT_DBL:
-			dict[index].value = malloc(sizeof(double));
+			dict[index].value = (double*)malloc(sizeof(double));
 			*(double*)dict[index].value = va_arg(valist, double);  
 			//printf("DICT ADD: %s=%f\n", __key, *(double*)dict[index].value);    
 			break;
 		case ADVDT_STR:
 			tempStr = va_arg(valist, char*);
-			dict[index].value = malloc(sizeof(char)*(strlen(tempStr)+1));
+			dict[index].value = (char*)malloc(sizeof(char)*(strlen(tempStr)+1));
 			strcpy((char*)dict[index].value, tempStr);
 			//printf("DICT ADD: %s=%s\n", __key, (char*)dict[index].value);     
 			break;
